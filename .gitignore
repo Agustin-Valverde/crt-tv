@@ -1,0 +1,17 @@
+# Media never goes in the repo
+videos/
+media/
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.webm
+*.m4v
+
+# Python
+__pycache__/
+*.pyc
+
+# Local env overrides / secrets
+.env
+*.local
