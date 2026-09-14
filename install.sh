@@ -16,6 +16,11 @@ LINE_RC="source \"$REPO/scripts/aliases.sh\""
 grep -qxF "$LINE_RC" "$HOME/.bashrc" 2>/dev/null \
   || echo "$LINE_RC" >> "$HOME/.bashrc"
 
+echo ">> Ensuring ~/.bash_profile loads ~/.bashrc (so aliases work over SSH)"
+LINE_SRC='[ -f ~/.bashrc ] && . ~/.bashrc'
+grep -qxF "$LINE_SRC" "$HOME/.bash_profile" 2>/dev/null \
+  || echo "$LINE_SRC" >> "$HOME/.bash_profile"
+
 echo ">> Ensuring video dir exists"
 source "$REPO/scripts/env.sh"
 mkdir -p "$VIDEO_DIR"
