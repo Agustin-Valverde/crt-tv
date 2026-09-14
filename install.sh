@@ -25,6 +25,15 @@ echo ">> Ensuring video dir exists"
 source "$REPO/scripts/env.sh"
 mkdir -p "$VIDEO_DIR"
 
+echo ">> Installing qBittorrent-nox (if missing)"
+if ! command -v qbittorrent-nox >/dev/null 2>&1; then
+  sudo apt-get update && sudo apt-get install -y qbittorrent-nox
+fi
+
+echo ">> Enabling qbittorrent-nox service for $(id -un)"
+sudo systemctl enable --now "qbittorrent-nox@$(id -un)"
+echo "   Web UI: http://raspberrypi.local:8080  (set save path to $VIDEO_DIR)"
+
 echo
 echo "Done. Reminders:"
 echo "  - Remove any OLD autostart block / aliases from ~/.bash_profile and ~/.bashrc"
