@@ -9,7 +9,7 @@ set -u
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/env.sh"
 
-MPV_COMMON=( --fullscreen --vo=drm --no-osc --really-quiet
+MPV_COMMON=( --fullscreen --vo=drm --drm-mode="$TV_DRM_MODE" --no-osc --really-quiet
              --input-ipc-server="$MPV_SOCKET" )
 
 while true; do
