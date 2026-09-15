@@ -34,6 +34,17 @@ echo ">> Enabling qbittorrent-nox service for $(id -un)"
 sudo systemctl enable --now "qbittorrent-nox@$(id -un)"
 echo "   Web UI: http://raspberrypi.local:8080  (set save path to $VIDEO_DIR)"
 
+
+echo ">> Linking mpv config (~/.config/mpv -> repo)"
+mkdir -p "$HOME/.config"
+if [ -e "$HOME/.config/mpv" ] && [ ! -L "$HOME/.config/mpv" ]; then
+  mv "$HOME/.config/mpv" "$HOME/.config/mpv.bak.$(date +%s)"
+fi
+ln -sfn "$REPO/config/mpv" "$HOME/.config/mpv"
+
+echo ">> Ensuring python3 is present"
+command -v python3 >/dev/null 2>&1 || sudo apt-get install -y python3
+
 echo
 echo "Done. Reminders:"
 echo "  - Remove any OLD autostart block / aliases from ~/.bash_profile and ~/.bashrc"

@@ -1,0 +1,7 @@
+{
+  "_comment": "Map a path substring to forced tracks/profile when heuristics get it wrong.",
+  "_examples": {
+    "Anime/Some Show": { "aid": 2, "sid": 4, "sub": true },
+    "Movies/Some Movie": { "profile": "native_subs" }
+  }
+}

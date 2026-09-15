@@ -34,23 +34,40 @@ mpv --no-video ~/videos/file.mp4                     # audio only (test without 
 - `--audio-device='alsa/sysdefault:CARD=vc4hdmi0'` forces sound out over HDMI (needed for the HDMI2AV box). Also set globally via `sudo raspi-config` → System Options → Audio → HDMI.
 - A little overscan/border is normal and expected on a CRT.
 
-## Control the TV
-The Pi boots into shuffled playback automatically (autologin on tty1 runs
-`~/play-tv.sh`, which loops mpv forever). These aliases (in `~/.bashrc`) control it over SSH:
+## The app (remote control)
+On an interactive SSH login the retro **TV / RADIO / EXIT** app opens automatically
+(`app/remote.py`). EXIT drops you to a shell; reopen with `tv-app`.
+- **TV → SHUFFLE**: randomized broadcast across everything.
+- **TV → Category → Show**: play a show in order (then auto-returns to shuffle).
+- **NOW PLAYING**: live controls over the CRT — `SPACE` pause, `←/→` seek,
+  `n/p` skip, `+/-` volume, `a` audio, `s` subs, `v` subs on/off,
+  `[ ]` sub size, `,/.` sub position, `z` zoom-to-fill.
+- Want a plain maintenance shell instead of the app: `TV_NO_APP=1 ssh …`, or EXIT.
+
+## Control the TV (shell)
+The Pi boots into shuffled playback (autologin on tty1 runs `play-tv.sh`).
+Control functions (from `scripts/aliases.sh` via `~/.bashrc`):
 ```bash
-tv-stop      # stop playback (kills the loop + mpv)
-tv-start     # start playback again (detached, survives logout)
+tv-stop      # pause playback (creates ~/.tv-paused so it survives getty respawn)
+tv-start     # resume
 tv-restart   # stop + start
-tv-status    # is it playing?
+tv-status    # PLAYING / STOPPED / idle
+tv-app       # open the remote app
+tv-update    # git pull the latest project on the Pi
 ```
-Manual equivalent if aliases aren't loaded:
+Manual equivalent:
 ```bash
-pkill -f play-tv.sh; pkill mpv          # stop
-nohup ~/play-tv.sh >/dev/null 2>&1 &    # start
+touch ~/.tv-paused; pkill mpv    # stop
+rm -f ~/.tv-paused               # start
 ```
-- Stopping is temporary — it auto-starts again on the next reboot (`sudo reboot`).
-- The player script lives at `~/play-tv.sh` (reference copy in `scripts/play-tv.sh`).
-- Autostart is guarded to tty1 only, so SSH sessions stay a normal shell.
+- Stopping is temporary — auto-starts again on reboot.
+- **Gotcha:** if `tv-stop` seems to "restart", stale OLD `alias tv-stop=...` lines
+  in `~/.bashrc` are shadowing the function — remove them (aliases beat functions).
+- Playlist switching uses a one-shot queue file `~/.tv-queue.m3u` + `pkill mpv`
+  (~1s "channel change"); when it ends, playback returns to shuffle.
+- Audio/subtitle rules live in `~/.config/mpv/scripts/autotracks.lua`
+  (per-show fixes in `~/.config/mpv/overrides.json`).
+- Sizing: 4:3 output is forced via `scripts/force-4x3.sh` (revertible: `force-4x3.sh off`).
 
 ## QoL / system info
 ```bash
