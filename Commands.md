@@ -69,6 +69,7 @@ rm -f ~/.tv-paused               # start
   (per-show fixes in `~/.config/mpv/overrides.json`).
 - Sizing: 4:3 output is forced via `scripts/force-4x3.sh` (revertible: `force-4x3.sh off`).
 
+
 ## QoL / system info
 ```bash
 vcgencmd measure_temp        # CPU temperature

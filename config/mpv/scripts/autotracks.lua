@@ -155,6 +155,15 @@ local function select_tracks()
 
   local profile = (ov and ov.profile) or CATEGORY_PROFILES[detect_category(path)] or DEFAULT_PROFILE
   apply_profile(profile, auds, subs)
+
+  -- Auto zoom-to-fill for widescreen content (4:3 CRT). The app's `z` key still
+  -- toggles this manually for the current file.
+  local w = mp.get_property_number("width")
+  local h = mp.get_property_number("height")
+  if w and h and h > 0 then
+    mp.set_property_number("panscan", (w / h >= 1.5) and 1.0 or 0.0)
+  end
+
   msg.info(string.format("autotracks: profile=%s aids=%d subs=%d", profile, #auds, #subs))
 end
 
