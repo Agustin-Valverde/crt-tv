@@ -66,4 +66,6 @@ class MPV:
         return self.command("add", prop, value)
 
     def set(self, prop, value):
-        return self.command("set", prop, value)
+        # Use set_property (native types); the "set" input-command rejects
+        # numeric values over IPC ("invalid parameter").
+        return self.command("set_property", prop, value)
