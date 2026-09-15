@@ -38,11 +38,18 @@ C_NORMAL, C_SELECT, C_ACCENT, C_DIM = 1, 2, 3, 4
 
 def init_colors():
     curses.start_color()
-    curses.use_default_colors()
-    curses.init_pair(C_NORMAL, curses.COLOR_WHITE, curses.COLOR_BLUE)
-    curses.init_pair(C_SELECT, curses.COLOR_BLACK, curses.COLOR_CYAN)
-    curses.init_pair(C_ACCENT, curses.COLOR_YELLOW, curses.COLOR_BLUE)
-    curses.init_pair(C_DIM, curses.COLOR_CYAN, curses.COLOR_BLUE)
+    # Use fixed 256-cube indices so a themed ANSI palette (matugen) can't wash
+    # out the blue/white. Fall back to the 8 base colors on limited terminals.
+    if curses.COLORS >= 256:
+        BLUE, WHITE, YELLOW, CYAN, BLACK, GRAY = 19, 231, 226, 51, 16, 253
+    else:
+        BLUE, WHITE, YELLOW, CYAN, BLACK, GRAY = (
+            curses.COLOR_BLUE, curses.COLOR_WHITE, curses.COLOR_YELLOW,
+            curses.COLOR_CYAN, curses.COLOR_BLACK, curses.COLOR_WHITE)
+    curses.init_pair(C_NORMAL, WHITE, BLUE)
+    curses.init_pair(C_SELECT, BLACK, CYAN)
+    curses.init_pair(C_ACCENT, YELLOW, BLUE)
+    curses.init_pair(C_DIM, GRAY, BLUE)
 
 
 def safe_add(win, y, x, text, attr=0):
