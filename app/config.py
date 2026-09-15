@@ -13,4 +13,7 @@ CATEGORIES = os.environ.get("TV_CATEGORIES", "Anime Cartoons-Series Movies").spl
 VIDEO_EXTS = {".mp4", ".mkv", ".avi", ".mov", ".webm", ".m4v"}
 
 # Command used for the Spotify TUI (RADIO). Overridable via env.
-SPOTIFY_CMD = os.environ.get("TV_SPOTIFY_CMD", "spotify_player")
+# Prefer the local binary (auto-launch may not have ~/.local/bin on PATH).
+_sp_local = os.path.join(HOME, ".local", "bin", "spotify_player")
+SPOTIFY_CMD = os.environ.get("TV_SPOTIFY_CMD") or (
+    _sp_local if os.path.exists(_sp_local) else "spotify_player")

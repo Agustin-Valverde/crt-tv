@@ -1,22 +1,32 @@
 #!/usr/bin/env bash
-# Install spotify_player (RADIO). Requires Spotify Premium for playback.
-# NOTE: builds from source on the Pi (can take a while).
+# Install spotify_player (RADIO) from the prebuilt aarch64 binary.
+# Requires Spotify Premium. 64-bit Raspberry Pi OS only.
 set -e
-echo ">> Installing build dependencies"
-sudo apt-get update
-sudo apt-get install -y build-essential pkg-config cmake \
-    libssl-dev libasound2-dev libdbus-1-dev
+VER="v0.25.1"
+URL="https://github.com/aome510/spotify-player/releases/download/${VER}/spotify_player-aarch64-unknown-linux-gnu.tar.gz"
 
-if ! command -v cargo >/dev/null 2>&1; then
-  echo ">> Installing Rust (rustup)"
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-  source "$HOME/.cargo/env"
-fi
+[ "$(uname -m)" = "aarch64" ] || { echo "Need 64-bit OS (aarch64); got $(uname -m)"; exit 1; }
 
-echo ">> Building spotify_player (streaming + media control)"
-cargo install spotify_player --locked --features streaming,media-control
+mkdir -p "$HOME/.local/bin"
+tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
+echo ">> Downloading spotify_player ${VER}"
+curl -fsSL "$URL" -o "$tmp/sp.tar.gz"
+tar xzf "$tmp/sp.tar.gz" -C "$tmp"
+install -m755 "$tmp/spotify_player" "$HOME/.local/bin/spotify_player"
+"$HOME/.local/bin/spotify_player" --version
 
-echo
-echo "Done. First run does an interactive Spotify login:"
-echo "    spotify_player"
-echo "Then RADIO in the app will launch it. (Premium required for playback.)"
+cat <<'MSG'
+
+Installed to ~/.local/bin/spotify_player
+
+NEXT: authenticate once (Premium required). From your PC, open an SSH session
+that forwards the OAuth callback port, then run the auth command:
+
+    ssh -L 8989:localhost:8989 avalverde@raspberrypi.local
+    # EXIT the TV app to a shell, then:
+    ~/.local/bin/spotify_player authenticate
+
+It prints a URL - open it in your PC browser, approve, and the redirect to
+127.0.0.1:8989 is forwarded to the Pi. Credentials are cached after that.
+Then RADIO in the app just works.
+MSG

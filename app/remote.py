@@ -265,11 +265,23 @@ def tv_menu(stdscr):
 
 def radio(stdscr):
     curses.endwin()
+    # Pause the TV so its audio doesn't clash with the music.
+    try:
+        open(config.TV_PAUSE_FLAG, "w").close()
+        subprocess.run(["pkill", "mpv"], check=False)
+    except OSError:
+        pass
     try:
         subprocess.call([config.SPOTIFY_CMD])
     except FileNotFoundError:
         input(f"\n'{config.SPOTIFY_CMD}' not installed. Run scripts/setup-spotify.sh.\n"
               "Press Enter to return...")
+    finally:
+        # Resume the TV when leaving RADIO.
+        try:
+            os.remove(config.TV_PAUSE_FLAG)
+        except FileNotFoundError:
+            pass
     stdscr.clear()
     stdscr.refresh()
 
